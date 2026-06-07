@@ -8,7 +8,7 @@ on:
 
 # Granting strict permissions for both commit hash tracking and PR comments
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   statuses: write
 

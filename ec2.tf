@@ -32,7 +32,7 @@ resource "aws_instance" "app_server" {
   # FIX FOR CKV_AWS_135: Force dedicated storage throughput bandwidth
   ebs_optimized = true
 
-  # FIX FOR CKV_AWS_126: Shrink CloudWatch tracking frequency down to 1 minute
+  # FIX FOR CKV_AWS_126: Shrink CloudWatch tracking frequency down to 1 minute..
   monitoring = true
 
   root_block_device {

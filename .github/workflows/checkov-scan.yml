@@ -50,11 +50,15 @@ jobs:
           infracost breakdown --path .
 
       # Step 6: Post cost table comment to the explicit commit hash (No if-condition used)
-      - name: Post Cost Estimate to GitHub Commit
+      - name: Calculate and Print Cost Breakdown
         run: |
-          infracost comment github --path /tmp/infracost.json \
-                                   --repo $GITHUB_REPOSITORY \
-                                   --github-token ${{ github.token }} \
-                                   --commit ${{ github.sha }} \
-                                   --behavior update
+          infracost breakdown --path . \
+                              --format json \
+                              --out-file /tmp/infracost.json
+          
+          # This line prints the raw JSON output file directly to your GitHub Action logs!
+          cat /tmp/infracost.json
+          
+          # Keep this so your text table still prints to logs too
+          infracost breakdown --path .
 

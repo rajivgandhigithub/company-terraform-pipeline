@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-# Grants permissions to read repository content and write comments to Pull Requests
 permissions:
   contents: read
   pull-requests: write
@@ -17,38 +16,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Clone the code onto the pipeline runner
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # Step 2: Initialize Python for the background scanning engines
       - name: Initialize Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # Step 3: Run your Checkov Security Scan
       - name: Evaluate IaC Security Policies
         uses: bridgecrewio/checkov-action@master
         with:
           config_file: .checkov.yaml
 
-      # Step 4: Install and configure Infracost
+      # Installs Infracost using your stored secret token
       - name: Setup Infracost CLI
         uses: infracost/actions/setup@v3
         with:
-          api-key: ${{ secrets.INFRACOST_API_KEY }} # References your secret token safely
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # Step 5: Generate the cost report in a machine-readable JSON format
-      - name: Calculate Infrastructure Cost Breakdown
+      # NORMAL STEP: Generates JSON data AND prints the cost table directly to your logs
+      - name: Calculate and Print Cost Breakdown
         run: |
           infracost breakdown --path . \
                               --format json \
                               --out-file /tmp/infracost.json
+          
+          # This forces Infracost to output the raw text table inside your GitHub Action logs
+          infracost breakdown --path .
 
-      # Step 6: Post the price chart as an automated comment on your Pull Request
+      # NORMAL STEP: Posts comment to PR (Will skip safely on direct pushes without breaking)
       - name: Post Cost Estimate to Pull Request
-        if: github.event_name == 'pull_request' # Only runs on Pull Requests to avoid main branch spam
         run: |
           infracost comment github --path /tmp/infracost.json \
                                    --repo $GITHUB_REPOSITORY \

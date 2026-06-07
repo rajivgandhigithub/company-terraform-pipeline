@@ -6,10 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
-# Grants permissions to read repository content and write comments to Pull Requests
 permissions:
   contents: read
   pull-requests: write
+  statuses: write
 
 jobs:
   infrastructure_audit:
@@ -17,42 +17,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Clone the code onto the pipeline runner
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # Step 2: Initialize Python for the background scanning engines
       - name: Initialize Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # Step 3: Run your Checkov Security Scan
       - name: Evaluate IaC Security Policies
         uses: bridgecrewio/checkov-action@master
         with:
           config_file: .checkov.yaml
 
-      # Step 4: Install and configure Infracost
       - name: Setup Infracost CLI
         uses: infracost/actions/setup@v3
         with:
-          api-key: ${{ secrets.INFRACOST_API_KEY }} # References your secret token safely
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # Step 5: Generate the cost report in a machine-readable JSON format
-      - name: Calculate Infrastructure Cost Breakdown
+      - name: Calculate and Print Cost Breakdown
         run: |
           infracost breakdown --path . \
                               --format json \
                               --out-file /tmp/infracost.json
+          
+          infracost breakdown --path .
 
-      # Step 6: Post the price chart as an automated comment on your Pull Request..
-      - name: Post Cost Estimate to Pull Request
-        if: github.event_name == 'pull_request' # Only runs on Pull Requests to avoid main branch spam
+      # NO IF CONDITION: Targets the specific commit hash instead of a PR number
+      - name: Post Cost Estimate to GitHub Commit
         run: |
           infracost comment github --path /tmp/infracost.json \
                                    --repo $GITHUB_REPOSITORY \
                                    --github-token ${{ github.token }} \
-                                   --pull-request ${{ github.event.pull_request.number }} \
+                                   --commit ${{ github.sha }} \
                                    --behavior update
 

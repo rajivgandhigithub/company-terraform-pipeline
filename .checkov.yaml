@@ -1,0 +1,10 @@
+directory:
+  - "."
+framework:
+  - "terraform"
+compact: true
+quiet: true          # Shows ONLY failures to keep corporate pipeline logs clean
+soft-fail: false     # HARD FAIL: Stop the pipeline if high-risk vulnerabilities are found
+skip-check:
+  - "CKV_AWS_144"    # Corporate Exemption: Cross-Region Replication handled via AWS Backup service
+

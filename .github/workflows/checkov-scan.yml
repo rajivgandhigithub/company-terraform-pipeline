@@ -1,0 +1,32 @@
+name: "SecOps: Infrastructure Compliance Audit"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  iac_security_scan:
+    name: "Checkov Compliance Guard"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Initialize Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Runs Checkov. It automatically reads your root .checkov.yaml for settings
+      - name: Evaluate IaC Best Practices
+        uses: bridgecrewio/checkov-action@master
+        with:
+          output_format: cli
+
+

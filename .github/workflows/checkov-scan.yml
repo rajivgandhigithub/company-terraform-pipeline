@@ -46,7 +46,7 @@ jobs:
                               --format json \
                               --out-file /tmp/infracost.json
 
-      # Step 6: Post the price chart as an automated comment on your Pull Request
+      # Step 6: Post the price chart as an automated comment on your Pull Request..
       - name: Post Cost Estimate to Pull Request
         if: github.event_name == 'pull_request' # Only runs on Pull Requests to avoid main branch spam
         run: |

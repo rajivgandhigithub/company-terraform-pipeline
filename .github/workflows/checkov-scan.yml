@@ -27,6 +27,6 @@ jobs:
       - name: Evaluate IaC Best Practices
         uses: bridgecrewio/checkov-action@master
         with:
-          output_format: cli
+          config_file: .checkov.yaml
 
 

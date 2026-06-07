@@ -17,13 +17,14 @@ resource "aws_s3_bucket_public_access_block" "company_data_privacy" {
   restrict_public_buckets = true
 }
 
-# FIX 2: Ensure all stored objects are encrypted at rest automatically
+# FIX 2: Upgraded to use AWS-managed KMS encryption (Fixes CKV_AWS_145)
 resource "aws_s3_bucket_server_side_encryption_configuration" "company_data_crypto" {
   bucket = aws_s3_bucket.company_data.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = "alias/aws/s3"
+      sse_algorithm     = "aws:kms"
     }
   }
 }
